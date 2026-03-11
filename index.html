@@ -1227,12 +1227,45 @@ footer{background:var(--surface);border-top:1px solid var(--border);
 // ══════════════════════════════════════
 //  ⚙️  CONFIGURE THESE 2 LINES
 // ══════════════════════════════════════
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbzgU3GaPm1mRV0o7M8UbHS0Lrp-1YlkL-1oYMWfR_KHfd08kuVCh8YFPzizOSeCCfCjMw/exec";   // Paste Google Apps Script URL here
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwaBsVutppMZmCLaCvUIlZahIHyEXAcSTx_7PJLKqJoN-juxDL4UBMggoQ2EnO3pmBs0w/exec";   // Paste Google Apps Script URL here
 const HOST_UPI  = "nabeen@upi";             // Nabeen's real UPI ID
 // ══════════════════════════════════════
 
-// Slot tracking per tournament (starts at 0, max 10)
+// Slot tracking — live from Google Sheets
 const slotCounts = { t1: 0, t2: 0 };
+
+// ── UPDATE SLOT UI ──
+function updateSlotUI(tid, n) {
+  const max = 10;
+  const count = Math.min(n, max);
+  document.getElementById('slots-' + tid + '-display').textContent = count + ' / ' + max;
+  document.getElementById('bar-' + tid).style.width = (count / max * 100) + '%';
+  slotCounts[tid] = count;
+  // If full, disable button
+  const btn = document.querySelector('#card-' + tid + ' .tc-register-btn');
+  if (btn && count >= max) {
+    btn.disabled = true;
+    btn.textContent = '❌ Tournament Full';
+    btn.style.background = 'var(--surface3)';
+    btn.style.color = 'var(--muted)';
+    btn.style.cursor = 'not-allowed';
+  }
+}
+
+// ── FETCH REAL-TIME COUNTS FROM SHEET ──
+async function fetchSlotCounts() {
+  if (SHEET_URL === 'YOUR_SCRIPT_URL_HERE') return;
+  try {
+    const res = await fetch(SHEET_URL + '?action=counts', { method: 'GET', mode: 'cors' });
+    const data = await res.json();
+    if (data.counts) {
+      updateSlotUI('t1', data.counts.t1 || 0);
+      updateSlotUI('t2', data.counts.t2 || 0);
+    }
+  } catch (e) {
+    // silently fail — sheet may not be set up yet
+  }
+}
 
 // Tournament info
 const tInfo = {
@@ -1246,6 +1279,11 @@ document.getElementById('upi-disp').textContent = HOST_UPI;
 if (SHEET_URL === 'YOUR_SCRIPT_URL_HERE') {
   document.getElementById('setup-warn').classList.add('show');
 }
+
+// Fetch real-time slot counts on page load
+fetchSlotCounts();
+// Auto-refresh counts every 30 seconds
+setInterval(fetchSlotCounts, 30000);
 
 // ── COUNTDOWN to T1 ──
 function tick() {
@@ -1349,11 +1387,11 @@ async function submitReg() {
       }),
     });
 
-    // Update slot count
+    // Update slot count immediately then re-fetch from sheet
     slotCounts[activeTid]++;
     const n = slotCounts[activeTid];
-    document.getElementById('slots-' + activeTid + '-display').textContent = n + ' / 10';
-    document.getElementById('bar-' + activeTid).style.width = (n / 10 * 100) + '%';
+    updateSlotUI(activeTid, n);
+    setTimeout(fetchSlotCounts, 2000); // re-fetch after 2s to confirm
 
     document.getElementById('reg-code').textContent = regCode;
     document.getElementById('modal-form').style.display = 'none';
