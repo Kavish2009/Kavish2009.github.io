@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V2N FF — Free Fire Squad Tournaments by Nabeen</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&family=Exo+2:ital,wght@0,400;0,700;1,700&display=swap" rel="stylesheet">
+<style>
+/* ── ROOT ── */
+:root{
+  --fire:#FF4500;--fire2:#ff6a00;--gold:#FFD700;--gold2:#ffb700;
+  --neon:#00FFD1;--neon2:#00c8a8;--purple:#a855f7;
+  --bg:#05070f;--bg2:#080c17;--surface:#0c1220;--surface2:#111827;--surface3:#1a2235;
+  --text:#eef0f8;--muted:#7a85a0;--muted2:#9aa3bc;
+  --border:rgba(0,255,209,0.12);--border2:rgba(255,69,0,0.18);
+  --glow:0 0 24px rgba(255,69,0,0.45);--glow2:0 0 24px rgba(0,255,209,0.3);
+  --glow-gold:0 0 24px rgba(255,215,0,0.35);
+  --radius:2px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;overflow-x:hidden;font-size:16px;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--fire);border-radius:3px;}
+
+/* GRID BG */
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(0,255,209,0.025) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,255,209,0.025) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none;}
+
+/* RADIAL GLOW ACCENTS */
+.hero-glow{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 55% at 50% 55%,rgba(255,69,0,0.10) 0%,transparent 70%),
+  radial-gradient(ellipse 35% 30% at 15% 85%,rgba(0,255,209,0.06) 0%,transparent 60%),
+  radial-gradient(ellipse 35% 25% at 85% 15%,rgba(168,85,247,0.05) 0%,transparent 60%);}
+
+.z1{position:relative;z-index:1;}
+
+/* ════════════════ NAV ════════════════ */
+nav{position:fixed;top:0;width:100%;z-index:200;
+  padding:0 40px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,7,15,0.88);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);}
+
+.nav-logo{font-family:'Orbitron';font-weight:900;font-size:1.4rem;
+  color:var(--fire);text-shadow:0 0 28px rgba(255,69,0,0.55);
+  text-decoration:none;letter-spacing:0.03em;}
+.nav-logo span{color:var(--neon);}
+
+nav ul{list-style:none;display:flex;gap:28px;align-items:center;}
+nav ul a{font-family:'Rajdhani';font-weight:600;font-size:0.88rem;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--muted2);
+  text-decoration:none;transition:color .2s;position:relative;}
+nav ul a::after{content:'';position:absolute;bottom:-3px;left:0;
+  width:0;height:1px;background:var(--neon);transition:width .3s;}
+nav ul a:hover{color:var(--neon);}
+nav ul a:hover::after{width:100%;}
+
+.nav-btn{background:transparent;color:var(--fire);
+  border:1px solid rgba(255,69,0,0.5);
+  padding:7px 20px;font-family:'Orbitron';font-size:0.7rem;
+  font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;transition:all .25s;
+  clip-path:polygon(7px 0%,100% 0%,calc(100% - 7px) 100%,0% 100%);}
+.nav-btn:hover{background:var(--fire);color:#fff;box-shadow:var(--glow);}
+
+/* ════════════════ TICKER ════════════════ */
+.ticker-wrap{background:linear-gradient(90deg,var(--fire),#c73500);
+  overflow:hidden;padding:7px 0;position:relative;z-index:1;margin-top:60px;}
+.ticker{display:flex;white-space:nowrap;animation:tickerAnim 28s linear infinite;}
+.ticker-item{padding:0 36px;font-family:'Share Tech Mono';font-size:0.72rem;
+  color:rgba(255,255,255,0.92);letter-spacing:0.12em;text-transform:uppercase;}
+.ticker-item::after{content:' ◆ ';color:rgba(255,255,255,0.35);}
+@keyframes tickerAnim{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* ════════════════ HERO ════════════════ */
+.hero{min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:80px 20px 50px;position:relative;overflow:hidden;}
+
+.hero-badge{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,255,209,0.07);border:1px solid rgba(0,255,209,0.22);
+  padding:5px 16px;font-family:'Share Tech Mono';font-size:0.72rem;
+  color:var(--neon);letter-spacing:0.18em;text-transform:uppercase;
+  margin-bottom:18px;animation:fadeUp .6s ease both;}
+.hero-badge::before{content:'◆';font-size:0.5rem;}
+
+.hero-title{font-family:'Orbitron';font-weight:900;
+  font-size:clamp(3.2rem,11vw,7.5rem);line-height:0.9;
+  letter-spacing:-0.02em;margin-bottom:12px;
+  animation:fadeUp .7s ease .08s both;}
+.v2n{color:var(--fire);text-shadow:0 0 60px rgba(255,69,0,0.5);
+  animation:flicker 2.5s ease-in-out infinite;}
+.ff{color:var(--gold);text-shadow:0 0 40px rgba(255,215,0,0.4);}
+
+.hero-tagline{font-family:'Exo 2';font-style:italic;font-size:clamp(1rem,2.5vw,1.4rem);
+  color:var(--muted2);letter-spacing:0.05em;margin-bottom:6px;
+  animation:fadeUp .7s ease .16s both;}
+
+.hero-host{font-family:'Share Tech Mono';font-size:0.82rem;
+  color:var(--neon);letter-spacing:0.08em;margin-bottom:28px;
+  animation:fadeUp .7s ease .22s both;}
+.hero-host span{color:var(--muted);font-size:0.75rem;}
+
+/* COUNTDOWN */
+.countdown-wrap{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:0 0 28px;}
+.countdown-unit{background:var(--surface2);border:1px solid var(--border);
+  padding:10px 18px;text-align:center;min-width:72px;position:relative;
+  overflow:hidden;}
+.countdown-unit::before{content:'';position:absolute;top:0;left:0;right:0;
+  height:2px;background:linear-gradient(90deg,var(--fire),var(--gold));}
+.countdown-num{font-family:'Orbitron';font-size:1.9rem;font-weight:900;
+  color:var(--fire);line-height:1;display:block;}
+.countdown-label{font-size:0.6rem;color:var(--muted);letter-spacing:0.15em;
+  text-transform:uppercase;margin-top:3px;display:block;}
+
+/* HERO STATS */
+.hero-stats{display:flex;gap:0;flex-wrap:wrap;justify-content:center;
+  margin-bottom:32px;animation:fadeUp .7s ease .28s both;
+  border:1px solid var(--border);background:var(--surface);}
+.hero-stat{text-align:center;padding:16px 28px;
+  border-right:1px solid var(--border);position:relative;}
+.hero-stat:last-child{border-right:none;}
+.hero-stat-num{font-family:'Orbitron';font-size:1.6rem;font-weight:900;
+  color:var(--gold);line-height:1;}
+.hero-stat-label{font-size:0.68rem;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--muted);margin-top:3px;}
+
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp .7s ease .34s both;}
+
+.scroll-hint{display:flex;flex-direction:column;align-items:center;gap:6px;
+  font-family:'Share Tech Mono';font-size:0.58rem;color:var(--muted);
+  letter-spacing:0.2em;animation:fadeUp 1s ease .8s both;margin-top:24px;}
+.scroll-hint::after{content:'';width:1px;height:36px;
+  background:linear-gradient(var(--neon),transparent);
+  animation:pulse 2s ease-in-out infinite;}
+
+/* QUOTES STRIP */
+.quote-strip{background:var(--surface);border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);padding:28px 40px;
+  text-align:center;position:relative;z-index:1;overflow:hidden;}
+.quote-strip::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(255,69,0,0.04),transparent);}
+.quote-text{font-family:'Exo 2';font-style:italic;font-size:clamp(1.1rem,2.5vw,1.6rem);
+  color:var(--text);line-height:1.4;max-width:800px;margin:0 auto;
+  position:relative;z-index:1;}
+.quote-text::before{content:'"';color:var(--fire);font-size:3rem;
+  line-height:0;vertical-align:-1rem;margin-right:6px;font-style:normal;}
+.quote-text::after{content:'"';color:var(--fire);font-size:3rem;
+  line-height:0;vertical-align:-1rem;margin-left:6px;font-style:normal;}
+.quote-author{font-family:'Share Tech Mono';font-size:0.72rem;
+  color:var(--neon);letter-spacing:0.15em;text-transform:uppercase;
+  margin-top:12px;position:relative;z-index:1;}
+
+/* ════════════════ BUTTONS ════════════════ */
+.btn-fire{background:var(--fire);color:#fff;border:none;
+  padding:13px 36px;font-family:'Orbitron';font-size:0.8rem;
+  font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+  transition:all .25s;text-decoration:none;display:inline-block;}
+.btn-fire:hover{background:#ff5500;box-shadow:var(--glow);transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--neon);
+  border:1px solid rgba(0,255,209,0.35);padding:13px 36px;
+  font-family:'Orbitron';font-size:0.8rem;font-weight:700;
+  letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;
+  clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+  transition:all .25s;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{background:rgba(0,255,209,0.07);box-shadow:var(--glow2);transform:translateY(-2px);}
+.btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#000;
+  border:none;padding:13px 36px;font-family:'Orbitron';font-size:0.8rem;
+  font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+  transition:all .25s;text-decoration:none;display:inline-block;}
+.btn-gold:hover{box-shadow:var(--glow-gold);transform:translateY(-2px);}
+
+/* ════════════════ SECTION BASE ════════════════ */
+section{padding:70px 40px;position:relative;z-index:1;}
+.sec-label{font-family:'Share Tech Mono';font-size:0.7rem;color:var(--neon);
+  letter-spacing:0.22em;text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;}
+.sec-label::before{content:'';width:28px;height:1px;background:var(--neon);}
+.sec-title{font-family:'Orbitron';font-weight:900;
+  font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1.1;margin-bottom:10px;}
+.sec-title .acc{color:var(--fire);}
+.sec-desc{color:var(--muted2);font-size:1rem;max-width:560px;line-height:1.65;}
+.container{max-width:1160px;margin:0 auto;}
+
+/* ════════════════ WHY JOIN ════════════════ */
+#why{background:var(--bg2);}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;margin-top:40px;}
+.why-card{background:var(--surface);border:1px solid var(--border);
+  padding:24px 20px;position:relative;overflow:hidden;
+  transition:transform .3s,box-shadow .3s;}
+.why-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.35);}
+.why-card::before{content:'';position:absolute;top:0;left:0;right:0;
+  height:2px;background:linear-gradient(90deg,var(--fire),transparent);}
+.why-icon{font-size:2rem;margin-bottom:12px;display:block;}
+.why-title{font-family:'Orbitron';font-size:0.88rem;font-weight:700;
+  color:#fff;margin-bottom:6px;}
+.why-desc{font-size:0.88rem;color:var(--muted2);line-height:1.55;}
+
+/* ════════════════ HOW IT WORKS ════════════════ */
+#how{background:var(--surface);}
+.steps-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:0;margin-top:44px;position:relative;}
+.steps-row::before{content:'';position:absolute;top:36px;left:8%;right:8%;
+  height:1px;background:linear-gradient(90deg,transparent,var(--neon),var(--neon),transparent);}
+.step{text-align:center;padding:0 16px 32px;}
+.step-circle{width:44px;height:44px;background:var(--bg);
+  border:2px solid var(--fire);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;font-family:'Orbitron';font-size:0.9rem;font-weight:900;
+  color:var(--fire);position:relative;z-index:2;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);}
+.step-icon2{font-size:1.8rem;margin-bottom:10px;display:block;}
+.step-t{font-family:'Orbitron';font-size:0.82rem;font-weight:700;
+  color:#fff;margin-bottom:6px;}
+.step-d{font-size:0.85rem;color:var(--muted2);line-height:1.5;}
+
+/* ════════════════ TOURNAMENTS ════════════════ */
+#tournaments{background:var(--bg);}
+.t-header{display:flex;align-items:flex-end;justify-content:space-between;
+  gap:16px;margin-bottom:40px;flex-wrap:wrap;}
+.t-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:20px;}
+
+/* TOURNAMENT CARD */
+.tc{background:var(--surface);border:1px solid var(--border);
+  overflow:hidden;transition:transform .3s,box-shadow .3s;}
+.tc:hover{transform:translateY(-5px);
+  box-shadow:0 24px 56px rgba(0,0,0,0.45),0 0 0 1px rgba(0,255,209,0.15);}
+.tc.featured{border-color:rgba(255,215,0,0.28);}
+.tc-top{padding:20px 22px;border-bottom:1px solid var(--border);
+  background:linear-gradient(135deg,rgba(255,69,0,0.12),rgba(255,215,0,0.04));
+  position:relative;}
+.tc.featured .tc-top{
+  background:linear-gradient(135deg,rgba(255,215,0,0.09),rgba(255,69,0,0.08));}
+.tc-badge{display:inline-block;background:var(--fire);color:#fff;
+  font-family:'Orbitron';font-size:0.65rem;font-weight:700;
+  letter-spacing:0.1em;padding:3px 10px;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+  margin-bottom:10px;}
+.tc-status{float:right;font-family:'Share Tech Mono';font-size:0.65rem;
+  padding:3px 9px;letter-spacing:0.1em;}
+.s-open{background:rgba(0,255,100,0.08);color:#00e05a;border:1px solid rgba(0,255,100,0.25);}
+.s-soon{background:rgba(255,215,0,0.08);color:var(--gold);border:1px solid rgba(255,215,0,0.25);}
+.tc-name{font-family:'Orbitron';font-size:1rem;font-weight:700;
+  color:#fff;margin-bottom:3px;}
+.tc-sub{font-family:'Share Tech Mono';font-size:0.75rem;color:var(--muted2);}
+
+.tc-body{padding:20px 22px;}
+.tc-grid4{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.tc-item label{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--muted);display:block;margin-bottom:3px;}
+.tc-item span{font-family:'Orbitron';font-size:0.95rem;font-weight:700;color:var(--gold);}
+.tc-item span.n{color:var(--neon);}
+
+.slots-wrap{margin-bottom:16px;}
+.slots-lbl{display:flex;justify-content:space-between;
+  font-size:0.7rem;color:var(--muted);margin-bottom:6px;}
+.slots-bar{height:3px;background:rgba(255,255,255,0.07);overflow:hidden;}
+.slots-fill{height:100%;background:linear-gradient(90deg,var(--fire),var(--gold));
+  transition:width 1.2s ease;}
+
+.tc-register-btn{width:100%;background:var(--fire);color:#fff;border:none;
+  padding:13px;font-family:'Orbitron';font-size:0.72rem;
+  font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  cursor:pointer;clip-path:polygon(7px 0%,100% 0%,calc(100% - 7px) 100%,0% 100%);
+  transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.tc-register-btn:hover{background:#ff5500;box-shadow:var(--glow);}
+
+/* SEASON 2 TEASER */
+.s2-card{background:var(--surface);border:1px solid rgba(168,85,247,0.25);
+  padding:28px;text-align:center;
+  background-image:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(168,85,247,0.05),transparent);}
+.s2-label{font-family:'Share Tech Mono';font-size:0.68rem;
+  color:var(--purple);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:8px;}
+.s2-title{font-family:'Orbitron';font-size:1.3rem;font-weight:900;
+  color:#fff;margin-bottom:8px;}
+.s2-desc{font-size:0.9rem;color:var(--muted2);margin-bottom:16px;line-height:1.6;}
+.s2-badge{display:inline-block;background:rgba(168,85,247,0.12);
+  border:1px solid rgba(168,85,247,0.3);
+  font-family:'Share Tech Mono';font-size:0.72rem;color:var(--purple);
+  padding:6px 18px;letter-spacing:0.15em;text-transform:uppercase;}
+
+/* ════════════════ PRIZES ════════════════ */
+#prizes{background:var(--surface);}
+.prize-row{display:flex;gap:14px;justify-content:center;
+  flex-wrap:wrap;margin-top:40px;}
+.p-card{flex:1;min-width:160px;max-width:220px;
+  background:var(--bg);border:1px solid var(--border);
+  padding:24px 18px;text-align:center;transition:transform .3s;
+  position:relative;overflow:hidden;}
+.p-card:hover{transform:translateY(-5px);}
+.p-card.p-gold{border-color:rgba(255,215,0,0.35);
+  background:linear-gradient(180deg,rgba(255,215,0,0.05) 0%,var(--bg) 100%);}
+.p-card::after{content:'';position:absolute;bottom:0;left:0;right:0;
+  height:2px;background:linear-gradient(90deg,transparent,var(--fire),transparent);}
+.p-card.p-gold::after{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.p-rank{font-family:'Share Tech Mono';font-size:0.62rem;
+  color:var(--muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:6px;}
+.p-icon{font-size:2.2rem;margin-bottom:12px;}
+.p-amount{font-family:'Orbitron';font-weight:900;font-size:1.8rem;
+  color:var(--gold);text-shadow:0 0 18px rgba(255,215,0,0.3);margin-bottom:4px;}
+.p-label{font-size:0.78rem;color:var(--muted);letter-spacing:0.05em;}
+
+.prize-note{margin-top:28px;background:rgba(0,255,209,0.04);
+  border:1px solid var(--border);padding:18px 22px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+.pn-item{font-size:0.85rem;color:var(--muted2);
+  display:flex;align-items:center;gap:8px;}
+.pn-item::before{content:'◆';color:var(--neon);font-size:0.5rem;flex-shrink:0;}
+
+/* ════════════════ STATS BAND ════════════════ */
+.stats-band{background:linear-gradient(135deg,var(--surface3),var(--surface2));
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:36px 40px;position:relative;z-index:1;overflow:hidden;}
+.stats-band::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 100% at 50% 50%,rgba(255,69,0,0.06),transparent);}
+.stats-inner{max-width:1160px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:0;position:relative;z-index:1;}
+.sband-item{text-align:center;padding:8px 20px;
+  border-right:1px solid var(--border);}
+.sband-item:last-child{border-right:none;}
+.sband-num{font-family:'Orbitron';font-size:2.2rem;font-weight:900;
+  color:var(--fire);line-height:1;margin-bottom:4px;}
+.sband-label{font-size:0.72rem;color:var(--muted);
+  letter-spacing:0.15em;text-transform:uppercase;}
+
+/* ════════════════ RULES ════════════════ */
+#rules{background:var(--bg);}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;margin-top:40px;}
+.rule-card{background:var(--surface);border:1px solid var(--border);
+  border-left:3px solid var(--fire);padding:20px;}
+.rule-card h3{font-family:'Orbitron';font-size:0.82rem;font-weight:700;
+  color:var(--neon);margin-bottom:14px;letter-spacing:0.05em;}
+.rule-ul{list-style:none;}
+.rule-ul li{font-size:0.86rem;color:var(--muted2);padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  display:flex;gap:8px;align-items:flex-start;line-height:1.45;}
+.rule-ul li::before{content:'›';color:var(--fire);flex-shrink:0;font-size:1rem;}
+
+/* ════════════════ LEADERBOARD ════════════════ */
+#leaderboard{background:var(--surface);}
+.lb-table{width:100%;border-collapse:collapse;margin-top:32px;font-family:'Rajdhani';}
+.lb-table th{font-family:'Share Tech Mono';font-size:0.65rem;
+  letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);
+  padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);}
+.lb-table td{padding:12px 14px;font-size:0.92rem;
+  border-bottom:1px solid rgba(255,255,255,0.04);transition:background .2s;}
+.lb-table tr:hover td{background:rgba(0,255,209,0.03);}
+.lb-r{font-family:'Orbitron';font-weight:900;font-size:0.85rem;}
+.r1{color:var(--gold);}.r2{color:#c0c0c0;}.r3{color:#cd7f32;}
+.lb-team{font-weight:700;color:#fff;}
+.lb-kills{color:var(--fire);font-family:'Share Tech Mono';font-size:0.85rem;}
+.lb-pts{color:var(--neon);font-family:'Share Tech Mono';font-size:0.85rem;}
+
+/* ════════════════ WHATSAPP / COMMUNITY ════════════════ */
+#community{background:var(--bg2);}
+.wa-banner{background:linear-gradient(135deg,rgba(37,211,102,0.1),rgba(0,255,209,0.05));
+  border:1px solid rgba(37,211,102,0.25);padding:32px;
+  display:flex;align-items:center;gap:28px;flex-wrap:wrap;
+  margin-top:32px;}
+.wa-icon{font-size:3.5rem;flex-shrink:0;}
+.wa-content h3{font-family:'Orbitron';font-size:1.1rem;color:#fff;
+  margin-bottom:6px;}
+.wa-content p{font-size:0.9rem;color:var(--muted2);line-height:1.6;
+  margin-bottom:14px;max-width:480px;}
+.wa-btn{background:#25D366;color:#fff;border:none;
+  padding:12px 28px;font-family:'Orbitron';font-size:0.75rem;
+  font-weight:700;letter-spacing:0.1em;cursor:pointer;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  text-decoration:none;display:inline-block;transition:all .25s;}
+.wa-btn:hover{background:#1ebe5c;box-shadow:0 0 20px rgba(37,211,102,0.35);}
+
+/* ════════════════ FAQ ════════════════ */
+#faq{background:var(--surface);}
+.faq-list{margin-top:32px;}
+.faq-item{border-bottom:1px solid var(--border);}
+.faq-q{width:100%;background:none;border:none;padding:16px 0;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:'Rajdhani';font-size:1rem;font-weight:600;
+  color:#fff;cursor:pointer;text-align:left;transition:color .2s;}
+.faq-q:hover{color:var(--neon);}
+.faq-q em{font-family:'Orbitron';font-style:normal;
+  font-size:0.9rem;color:var(--fire);transition:transform .3s;}
+.faq-item.open .faq-q em{transform:rotate(45deg);color:var(--neon);}
+.faq-a{max-height:0;overflow:hidden;font-size:0.9rem;
+  color:var(--muted2);line-height:1.65;
+  transition:max-height .4s ease,padding .3s;padding:0;}
+.faq-item.open .faq-a{max-height:300px;padding-bottom:16px;}
+
+/* ════════════════ CONTACT ════════════════ */
+#contact{background:var(--bg);}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;margin-top:40px;}
+.contact-card{background:var(--surface);border:1px solid var(--border);
+  padding:24px;display:flex;flex-direction:column;gap:10px;}
+.contact-card h3{font-family:'Orbitron';font-size:0.85rem;
+  color:var(--neon);letter-spacing:0.05em;margin-bottom:4px;}
+.contact-role{font-family:'Share Tech Mono';font-size:0.68rem;
+  color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;}
+.contact-line{display:flex;align-items:center;gap:10px;
+  font-size:0.9rem;color:var(--muted2);}
+.contact-line a{color:var(--neon);text-decoration:none;
+  transition:color .2s;}
+.contact-line a:hover{color:#fff;}
+.contact-line strong{color:#fff;font-family:'Share Tech Mono';font-size:0.85rem;}
+
+/* ════════════════ FOOTER ════════════════ */
+footer{background:var(--surface);border-top:1px solid var(--border);
+  padding:44px 40px 24px;position:relative;z-index:1;}
+.footer-inner{max-width:1160px;margin:0 auto;}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr;
+  gap:40px;margin-bottom:36px;}
+.footer-brand h2{font-family:'Orbitron';font-size:1.4rem;
+  color:var(--fire);margin-bottom:10px;}
+.footer-brand h2 span{color:var(--neon);}
+.footer-brand .tagline{font-size:0.85rem;color:var(--muted2);
+  line-height:1.65;margin-bottom:12px;}
+.footer-meta{font-family:'Share Tech Mono';font-size:0.7rem;
+  color:var(--muted);letter-spacing:0.05em;line-height:2;}
+.socials{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.soc-btn{background:var(--bg);border:1px solid var(--border);
+  color:var(--muted2);padding:7px 14px;font-family:'Share Tech Mono';
+  font-size:0.7rem;text-decoration:none;letter-spacing:0.05em;
+  transition:all .2s;clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);}
+.soc-btn:hover{border-color:var(--neon);color:var(--neon);}
+.footer-col h3{font-family:'Orbitron';font-size:0.75rem;
+  color:var(--text);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;}
+.footer-col ul{list-style:none;}
+.footer-col li{margin-bottom:9px;}
+.footer-col a{font-size:0.88rem;color:var(--muted2);text-decoration:none;transition:color .2s;}
+.footer-col a:hover{color:var(--neon);}
+.footer-bottom{border-top:1px solid var(--border);padding-top:20px;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:8px;}
+.footer-copy{font-family:'Share Tech Mono';font-size:0.67rem;
+  color:var(--muted);letter-spacing:0.05em;}
+
+/* ════════════════ MODAL ════════════════ */
+.modal-overlay{position:fixed;inset:0;z-index:500;
+  background:rgba(5,7,15,0.93);backdrop-filter:blur(18px);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;opacity:0;pointer-events:none;transition:opacity .3s;}
+.modal-overlay.active{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border);
+  width:100%;max-width:580px;max-height:93vh;overflow-y:auto;
+  transform:translateY(24px);transition:transform .3s;}
+.modal-overlay.active .modal{transform:translateY(0);}
+
+.modal-head{background:linear-gradient(135deg,rgba(255,69,0,0.14),rgba(255,215,0,0.05));
+  border-bottom:1px solid var(--border);padding:22px 28px;position:relative;}
+.modal-close{position:absolute;top:16px;right:18px;
+  background:none;border:none;cursor:pointer;
+  color:var(--muted);font-size:1.1rem;transition:color .2s;}
+.modal-close:hover{color:var(--fire);}
+.modal-title{font-family:'Orbitron';font-size:1.2rem;font-weight:700;
+  color:#fff;margin-bottom:3px;}
+.modal-sub{font-family:'Share Tech Mono';font-size:0.75rem;color:var(--neon);}
+
+.modal-body{padding:24px 28px;}
+
+.setup-warn{background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.25);
+  border-left:3px solid var(--gold);padding:12px 16px;
+  font-size:0.8rem;color:var(--gold);font-family:'Share Tech Mono';
+  line-height:1.6;display:none;margin-bottom:18px;}
+.setup-warn.show{display:block;}
+
+.pay-box{background:rgba(255,69,0,0.07);border:1px solid var(--border2);
+  border-left:3px solid var(--fire);padding:16px;margin-bottom:20px;}
+.pay-box h4{font-family:'Orbitron';font-size:0.8rem;color:var(--fire);
+  margin-bottom:10px;letter-spacing:0.04em;}
+.upi-row{display:flex;align-items:center;gap:10px;
+  background:var(--bg);padding:10px 14px;
+  border:1px dashed rgba(255,215,0,0.28);margin-bottom:10px;}
+.upi-val{font-family:'Share Tech Mono';font-size:0.95rem;color:var(--gold);flex:1;}
+.copy-upi{background:none;border:1px solid rgba(0,255,209,0.28);
+  color:var(--neon);padding:5px 10px;font-family:'Share Tech Mono';
+  font-size:0.65rem;cursor:pointer;letter-spacing:0.1em;transition:all .2s;}
+.copy-upi:hover{background:rgba(0,255,209,0.09);}
+.pay-note{font-size:0.78rem;color:var(--muted2);line-height:1.5;}
+
+.err-box{background:rgba(255,69,0,0.09);border:1px solid rgba(255,69,0,0.28);
+  border-left:3px solid var(--fire);padding:10px 14px;
+  font-size:0.82rem;color:#ffaa80;display:none;margin-bottom:16px;}
+.err-box.show{display:block;}
+
+/* FORM */
+.fg{margin-bottom:16px;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.fl{display:block;font-family:'Share Tech Mono';font-size:0.62rem;
+  letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.fi,.fs{width:100%;background:var(--bg);border:1px solid var(--border);
+  color:var(--text);padding:10px 14px;font-family:'Rajdhani';
+  font-size:0.95rem;outline:none;transition:border-color .2s,box-shadow .2s;
+  appearance:none;border-radius:0;}
+.fi:focus,.fs:focus{border-color:rgba(0,255,209,0.38);
+  box-shadow:0 0 0 3px rgba(0,255,209,0.05);}
+.fi::placeholder{color:var(--muted);font-size:0.88rem;}
+
+/* UID section */
+.uid-section{background:rgba(0,255,209,0.04);border:1px solid var(--border);
+  padding:16px;margin-bottom:16px;}
+.uid-section-title{font-family:'Orbitron';font-size:0.75rem;color:var(--neon);
+  letter-spacing:0.1em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.uid-section-title::before{content:'👥';font-size:1rem;}
+
+.submit-btn{width:100%;padding:14px;background:var(--fire);color:#fff;border:none;
+  font-family:'Orbitron';font-size:0.8rem;font-weight:700;
+  letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;
+  clip-path:polygon(9px 0%,100% 0%,calc(100% - 9px) 100%,0% 100%);
+  transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.submit-btn:hover:not(:disabled){background:#ff5500;box-shadow:var(--glow);}
+.submit-btn:disabled{background:var(--surface3);color:var(--muted);cursor:not-allowed;}
+.submit-btn.loading{background:#7a2200;}
+.spinner{display:inline-block;width:13px;height:13px;
+  border:2px solid rgba(255,255,255,0.28);border-top-color:#fff;
+  border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* SUCCESS */
+.success-view{display:none;text-align:center;padding:36px 28px;}
+.success-view.show{display:block;}
+.suc-icon{font-size:3.5rem;margin-bottom:16px;}
+.suc-title{font-family:'Orbitron';font-size:1.2rem;color:var(--neon);margin-bottom:8px;}
+.suc-code{background:var(--bg);border:1px dashed rgba(0,255,209,0.28);
+  padding:10px 22px;display:inline-block;
+  font-family:'Share Tech Mono';font-size:1rem;
+  color:var(--gold);letter-spacing:0.2em;margin:14px 0;}
+
+/* ════════════════ CONFETTI ════════════════ */
+#confetti-canvas{position:fixed;inset:0;z-index:9998;pointer-events:none;display:none;}
+
+/* CODE NOTE BOX */
+.code-note{background:rgba(255,215,0,0.08);border:2px solid var(--gold);
+  padding:16px 20px;margin:14px 0 20px;text-align:center;}
+.code-note-title{font-family:'Orbitron';font-size:0.8rem;color:var(--gold);
+  letter-spacing:0.08em;margin-bottom:6px;}
+.code-note-val{font-family:'Share Tech Mono';font-size:1.3rem;
+  color:#fff;letter-spacing:0.25em;margin-bottom:8px;}
+.code-note-warn{font-size:0.8rem;color:#ffcc44;
+  display:flex;align-items:center;justify-content:center;gap:6px;line-height:1.4;}
+
+/* READ RULES NOTICE */
+.rules-notice{background:rgba(255,69,0,0.07);border:1px solid rgba(255,69,0,0.28);
+  border-left:3px solid var(--fire);padding:10px 14px;
+  margin-bottom:18px;display:flex;align-items:center;gap:10px;
+  font-size:0.84rem;color:var(--muted2);}
+.rules-notice a{color:var(--fire);font-weight:700;text-decoration:none;}
+.rules-notice a:hover{color:#ff7044;text-decoration:underline;}
+
+/* ════════════════ TOAST ════════════════ */
+.toast{position:fixed;bottom:28px;right:28px;z-index:9999;
+  background:var(--surface);border:1px solid rgba(0,255,209,0.25);
+  border-left:3px solid var(--neon);padding:13px 20px;
+  font-family:'Rajdhani';font-size:0.92rem;color:var(--text);
+  transform:translateX(120%);opacity:0;transition:all .3s;max-width:300px;}
+.toast.show{transform:translateX(0);opacity:1;}
+
+/* ════════════════ ANIMATIONS ════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes flicker{0%,100%{text-shadow:0 0 40px rgba(255,69,0,0.5);}50%{text-shadow:0 0 80px rgba(255,69,0,0.85);}}
+@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+/* ════════════════ RESPONSIVE ════════════════ */
+@media(max-width:768px){
+  nav{padding:0 16px;}
+  nav ul{display:none;}
+  section{padding:50px 16px;}
+  .fg-row{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr;}
+  .hero-stats{flex-direction:column;gap:0;}
+  .hero-stat{border-right:none;border-bottom:1px solid var(--border);}
+  .hero-stat:last-child{border-bottom:none;}
+  .stats-inner{grid-template-columns:1fr 1fr;}
+  .sband-item:nth-child(2n){border-right:none;}
+  .wa-banner{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <a class="nav-logo z1" href="#">V2N<span>FF</span></a>
+  <ul>
+    <li><a href="#tournaments">Tournaments</a></li>
+    <li><a href="#prizes">Prizes</a></li>
+    <li><a href="#leaderboard">Board</a></li>
+    <li><a href="#rules">Rules</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-btn" onclick="scrollToRegister()">⚔ Register</button>
+</nav>
+
+<!-- ═══ TICKER ═══ -->
+<div class="ticker-wrap z1">
+  <div class="ticker">
+    <span class="ticker-item">V2N FF Season 1 — Squad Tournaments</span>
+    <span class="ticker-item">Entry Fee ₹50 Per Squad</span>
+    <span class="ticker-item">1 Apr & 14 Apr 2026 · 11:00 AM IST</span>
+    <span class="ticker-item">Hosted by Nabeen · Managed by Kavish</span>
+    <span class="ticker-item">Open to All Levels — No Restrictions!</span>
+    <span class="ticker-item">Cash Prizes Every Tournament</span>
+    <span class="ticker-item">V2N FF Season 1 — Squad Tournaments</span>
+    <span class="ticker-item">Entry Fee ₹50 Per Squad</span>
+    <span class="ticker-item">1 Apr & 14 Apr 2026 · 11:00 AM IST</span>
+    <span class="ticker-item">Hosted by Nabeen · Managed by Kavish</span>
+    <span class="ticker-item">Open to All Levels — No Restrictions!</span>
+    <span class="ticker-item">Cash Prizes Every Tournament</span>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero z1" id="home">
+  <div class="hero-glow"></div>
+
+  <div class="hero-badge z1">Season 1 · April · 2026</div>
+
+  <h1 class="hero-title z1">
+    <span class="v2n">V2N</span> <span class="ff">FF</span>
+  </h1>
+
+  <p class="hero-tagline z1">Where Champions Are Made. Every Squad Has a Story.</p>
+
+  <div class="hero-host z1">
+    <div>Hosted by <strong style="color:#fff;font-size:1rem">Nabeen</strong></div>
+    <div style="margin-top:4px">Managed by <strong style="color:#fff;font-size:1rem">Kavish</strong></div>
+  </div>
+
+  <div class="countdown-wrap z1">
+    <div class="countdown-unit"><span class="countdown-num" id="cd-d">--</span><span class="countdown-label">Days</span></div>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-h">--</span><span class="countdown-label">Hours</span></div>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-m">--</span><span class="countdown-label">Mins</span></div>
+    <div class="countdown-unit"><span class="countdown-num" id="cd-s">--</span><span class="countdown-label">Secs</span></div>
+  </div>
+
+  <div class="hero-stats z1">
+    <div class="hero-stat"><div class="hero-stat-num">2</div><div class="hero-stat-label">Tournaments</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">₹50</div><div class="hero-stat-label">Per Squad</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">Teams Max</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">₹400</div><div class="hero-stat-label">Total Prizes</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">🏆</div><div class="hero-stat-label">Cash Payout</div></div>
+  </div>
+
+  <div class="hero-cta z1">
+    <button class="btn-fire" onclick="scrollToRegister()">⚔️ Register Your Squad</button>
+    <a href="#how" class="btn-ghost">How To Join</a>
+  </div>
+
+  <div class="scroll-hint z1">SCROLL DOWN</div>
+</section>
+
+<!-- ═══ QUOTE ═══ -->
+<div class="quote-strip z1">
+  <div class="quote-text">Every legend started as a nobody. Your squad's moment starts here — April 2026.</div>
+  <div class="quote-author">— V2N FF Season 1</div>
+</div>
+
+<!-- ═══ WHY JOIN ═══ -->
+<section id="why">
+  <div class="container">
+    <div class="sec-label">Why Compete</div>
+    <h2 class="sec-title">Why Join <span class="acc">V2N FF?</span></h2>
+    <p class="sec-desc">It's not just a tournament — it's a battleground for the fearless. Here's what makes V2N different.</p>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-icon">💰</span>
+        <div class="why-title">Real Cash Prizes</div>
+        <div class="why-desc">Win actual money — directly to your UPI ID within 24 hours of the match results. No delays, no excuses.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🎯</span>
+        <div class="why-title">Open to Everyone</div>
+        <div class="why-desc">New player or veteran — every squad is welcome. No level or rank restrictions. Pure skill decides who wins.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">⚡</span>
+        <div class="why-title">Only ₹50 Entry</div>
+        <div class="why-desc">Register your entire 4-player squad for just ₹50. That's less than a tea break. The prize? Way more than that.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🛡️</span>
+        <div class="why-title">Fair & Transparent</div>
+        <div class="why-desc">Custom rooms, strict anti-cheat, and host decisions are final. A fair fight every single time.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">📲</span>
+        <div class="why-title">Easy Registration</div>
+        <div class="why-desc">Fill the form, pay ₹50 via UPI, and you're in. Room ID delivered to WhatsApp 30 minutes before kickoff.</div>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">🔥</span>
+        <div class="why-title">Growing Community</div>
+        <div class="why-desc">Join our WhatsApp group for updates, memes, results and announcements. Season 2 is already being planned!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS BAND ═══ -->
+<div class="stats-band">
+  <div class="stats-inner">
+    <div class="sband-item"><div class="sband-num">₹50</div><div class="sband-label">Entry / Squad</div></div>
+    <div class="sband-item"><div class="sband-num">10</div><div class="sband-label">Teams / Match</div></div>
+    <div class="sband-item"><div class="sband-num">40</div><div class="sband-label">Total Players</div></div>
+    <div class="sband-item"><div class="sband-num">11AM</div><div class="sband-label">Match Time</div></div>
+    <div class="sband-item"><div class="sband-num">24h</div><div class="sband-label">Prize Payout</div></div>
+  </div>
+</div>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section id="how">
+  <div class="container">
+    <div class="sec-label">Process</div>
+    <h2 class="sec-title">How To <span class="acc">Join</span></h2>
+    <p class="sec-desc">4 easy steps between you and the battlefield. Takes less than 5 minutes.</p>
+    <div class="steps-row">
+      <div class="step">
+        <div class="step-circle">01</div>
+        <span class="step-icon2">🎯</span>
+        <div class="step-t">Form Your Squad</div>
+        <div class="step-d">Get 3 more players ready. You need all 4 UIDs to register. Captain leads the squad.</div>
+      </div>
+      <div class="step">
+        <div class="step-circle">02</div>
+        <span class="step-icon2">💸</span>
+        <div class="step-t">Pay ₹50 via UPI</div>
+        <div class="step-d">Send ₹50 to Nabeen's UPI. Save the Transaction ID — you'll need it in the form.</div>
+      </div>
+      <div class="step">
+        <div class="step-circle">03</div>
+        <span class="step-icon2">📋</span>
+        <div class="step-t">Fill Registration</div>
+        <div class="step-d">Enter team name, all 4 player UIDs, captain details and transaction ID. Takes 2 minutes.</div>
+      </div>
+      <div class="step">
+        <div class="step-circle">04</div>
+        <span class="step-icon2">🎮</span>
+        <div class="step-t">Battle & Win</div>
+        <div class="step-d">Room ID sent on WhatsApp 30 minutes before 11 AM. Drop in, frag out, take the prize.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOURNAMENTS ═══ -->
+<section id="tournaments">
+  <div class="container">
+    <div class="t-header">
+      <div>
+        <div class="sec-label">Season 1</div>
+        <h2 class="sec-title">Active <span class="acc">Tournaments</span></h2>
+        <p class="sec-desc">Two squad tournaments this April. Slots are limited — 10 teams only per match!</p>
+      </div>
+    </div>
+
+    <div class="t-grid">
+
+      <!-- TOURNAMENT 1 -->
+      <div class="tc" id="card-t1">
+        <div class="tc-top">
+          <span class="tc-status s-open">● OPEN</span>
+          <div class="tc-badge">01 APR 2026</div>
+          <div class="tc-name">V2N FF — Tournament #1</div>
+          <div class="tc-sub">4v4 Squad · Battle Royale · Custom Room</div>
+        </div>
+        <div class="tc-body">
+          <div class="tc-grid4">
+            <div class="tc-item"><label>Entry Fee</label><span>₹50 / Squad</span></div>
+            <div class="tc-item"><label>1st Prize</label><span>₹200</span></div>
+            <div class="tc-item"><label>Format</label><span class="n">Battle Royale</span></div>
+            <div class="tc-item"><label>Time</label><span class="n">11:00 AM</span></div>
+          </div>
+          <div class="slots-wrap">
+            <div class="slots-lbl">
+              <span>Teams Registered</span>
+              <span id="slots-t1-display">0 / 10</span>
+            </div>
+            <div class="slots-bar">
+              <div class="slots-fill" id="bar-t1" style="width:0%"></div>
+            </div>
+          </div>
+          <button class="tc-register-btn" onclick="openModal('t1')">
+            ⚔️ Register Squad — ₹50
+          </button>
+        </div>
+      </div>
+
+      <!-- TOURNAMENT 2 -->
+      <div class="tc featured" id="card-t2">
+        <div class="tc-top">
+          <span class="tc-status s-soon">◐ UPCOMING</span>
+          <div class="tc-badge">14 APR 2026</div>
+          <div class="tc-name">V2N FF — Tournament #2</div>
+          <div class="tc-sub">4v4 Squad · Battle Royale · Custom Room</div>
+        </div>
+        <div class="tc-body">
+          <div class="tc-grid4">
+            <div class="tc-item"><label>Entry Fee</label><span>₹50 / Squad</span></div>
+            <div class="tc-item"><label>1st Prize</label><span>₹200</span></div>
+            <div class="tc-item"><label>Format</label><span class="n">Battle Royale</span></div>
+            <div class="tc-item"><label>Time</label><span class="n">11:00 AM</span></div>
+          </div>
+          <div class="slots-wrap">
+            <div class="slots-lbl">
+              <span>Teams Registered</span>
+              <span id="slots-t2-display">0 / 10</span>
+            </div>
+            <div class="slots-bar">
+              <div class="slots-fill" id="bar-t2" style="width:0%"></div>
+            </div>
+          </div>
+          <button class="tc-register-btn" onclick="openModal('t2')">
+            ⚔️ Register Squad — ₹50
+          </button>
+        </div>
+      </div>
+
+      <!-- SEASON 2 TEASER -->
+      <div class="s2-card">
+        <div class="s2-label">Coming Next</div>
+        <div class="s2-title">🔜 Season 2 — Solo Tournaments</div>
+        <div class="s2-desc">
+          Season 2 will feature intense solo Battle Royale action. Every man for himself — your skills, your glory. 
+          Register your interest now and be the first to know when Season 2 drops!
+        </div>
+        <div class="s2-badge">Solo Mode · Coming Soon</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PRIZES ═══ -->
+<section id="prizes">
+  <div class="container">
+    <div class="sec-label">Rewards</div>
+    <h2 class="sec-title">Prize <span class="acc">Breakdown</span></h2>
+    <p class="sec-desc">Every rupee of your entry fee goes back to the winners. 100% player-funded prize pool.</p>
+
+    <div class="prize-row">
+      <div class="p-card">
+        <div class="p-rank">3rd Place</div>
+        <div class="p-icon">🥉</div>
+        <div class="p-amount">₹65</div>
+        <div class="p-label">Squad Prize</div>
+      </div>
+      <div class="p-card p-gold">
+        <div class="p-rank">1st Place</div>
+        <div class="p-icon">🏆</div>
+        <div class="p-amount">₹200</div>
+        <div class="p-label">Champion Squad</div>
+      </div>
+      <div class="p-card">
+        <div class="p-rank">2nd Place</div>
+        <div class="p-icon">🥈</div>
+        <div class="p-amount">₹100</div>
+        <div class="p-label">Runner-up Squad</div>
+      </div>
+      <div class="p-card">
+        <div class="p-rank">Top Fragger</div>
+        <div class="p-icon">💀</div>
+        <div class="p-amount">₹35</div>
+        <div class="p-label">Best individual kills</div>
+      </div>
+    </div>
+
+    <div class="prize-note">
+      <div class="pn-item">Prizes paid to UPI within 24 hours of results</div>
+      <div class="pn-item">Top Fragger = most kills as an individual player</div>
+      <div class="pn-item">Pool = all entry fees × 10 teams</div>
+      <div class="pn-item">Screenshot your kills for fragger proof</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COMMUNITY / WHATSAPP ═══ -->
+<section id="community">
+  <div class="container">
+    <div class="sec-label">Community</div>
+    <h2 class="sec-title">Join the <span class="acc">WhatsApp Group</span></h2>
+    <p class="sec-desc">Stay updated with announcements, results, memes, and match schedules. A separate match room group will be created 30 minutes before each tournament.</p>
+
+    <div class="wa-banner">
+      <div class="wa-icon">📱</div>
+      <div class="wa-content">
+        <h3>V2N FF Community Group</h3>
+        <p>
+          Join the official V2N FF WhatsApp group for real-time tournament updates, slot announcements, results, and community fun. 
+          <strong style="color:#fff">Note:</strong> A dedicated match group with the Room ID & password will be created separately 30 minutes before each match starts.
+        </p>
+        <a class="wa-btn" href="https://chat.whatsapp.com/KqQaCiu2M4f4wwEVnK5yi9" target="_blank" rel="noopener">
+          📲 Join WhatsApp Group
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ LEADERBOARD ═══ -->
+<section id="leaderboard">
+  <div class="container">
+    <div class="sec-label">Hall of Fame</div>
+    <h2 class="sec-title">Top <span class="acc">Squads</span></h2>
+    <p class="sec-desc">Champions will be immortalised here after each tournament. Could your squad be next?</p>
+
+    <table class="lb-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Team Name</th>
+          <th>Captain</th>
+          <th>Tournament</th>
+          <th>Kills</th>
+          <th>Prize</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="lb-r r1">01</span></td>
+          <td class="lb-team">— TBD —</td>
+          <td style="color:var(--muted);font-size:.82rem">—</td>
+          <td style="color:var(--muted);font-size:.82rem">T#1 · 1 Apr</td>
+          <td class="lb-kills">—</td>
+          <td style="color:var(--gold);font-family:'Orbitron';font-size:.82rem">₹200</td>
+        </tr>
+        <tr>
+          <td><span class="lb-r r2">02</span></td>
+          <td class="lb-team">— TBD —</td>
+          <td style="color:var(--muted);font-size:.82rem">—</td>
+          <td style="color:var(--muted);font-size:.82rem">T#1 · 1 Apr</td>
+          <td class="lb-kills">—</td>
+          <td style="color:var(--gold);font-family:'Orbitron';font-size:.82rem">₹100</td>
+        </tr>
+        <tr>
+          <td><span class="lb-r r3">03</span></td>
+          <td class="lb-team">— TBD —</td>
+          <td style="color:var(--muted);font-size:.82rem">—</td>
+          <td style="color:var(--muted);font-size:.82rem">T#1 · 1 Apr</td>
+          <td class="lb-kills">—</td>
+          <td style="color:var(--gold);font-family:'Orbitron';font-size:.82rem">₹65</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:14px;font-family:'Share Tech Mono'">Updated after each tournament · Top Fragger also announced</p>
+  </div>
+</section>
+
+<!-- ═══ RULES ═══ -->
+<section id="rules">
+  <div class="container">
+    <div class="sec-label">Read Before Playing</div>
+    <h2 class="sec-title">Tournament <span class="acc">Rules</span></h2>
+    <p class="sec-desc">Know the rules, respect the game. Violations result in immediate disqualification.</p>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <h3>🎮 Game Rules</h3>
+        <ul class="rule-ul">
+          <li>All 4 players must use their registered Free Fire UIDs</li>
+          <li>No hacks, mods, emulators, or third-party tools</li>
+          <li>Squad must be present in lobby 15 min before match</li>
+          <li>No intentional disconnection or leaving match</li>
+          <li>Room ID & password sent 30 min before on WhatsApp</li>
+          <li>1 life per player — no respawns in custom room</li>
+        </ul>
+      </div>
+      <div class="rule-card">
+        <h3>💰 Payment Rules</h3>
+        <ul class="rule-ul">
+          <li>Pay ₹50 per squad via UPI before submitting form</li>
+          <li>Enter valid UPI Transaction ID in registration</li>
+          <li>No refunds after registration is confirmed</li>
+          <li>Fake or invalid payment = disqualification</li>
+          <li>Prizes paid via UPI within 24 hours of results</li>
+          <li>Provide correct captain UPI ID for prize receipt</li>
+        </ul>
+      </div>
+      <div class="rule-card">
+        <h3>⚠️ Conduct Rules</h3>
+        <ul class="rule-ul">
+          <li>No teaming with enemy squads (stream sniping)</li>
+          <li>No abusive language in lobby or group chat</li>
+          <li>Host's decision is final in all disputes</li>
+          <li>Report cheaters with video proof to host</li>
+          <li>One team registration per squad per tournament</li>
+          <li>Impersonating another player = permanent ban</li>
+        </ul>
+      </div>
+      <div class="rule-card">
+        <h3>📱 Technical Rules</h3>
+        <ul class="rule-ul">
+          <li>All 4 squad members must be online before start</li>
+          <li>Stable internet is the player's responsibility</li>
+          <li>Join the WhatsApp community group for updates</li>
+          <li>Screenshot kills — required for Top Fragger claim</li>
+          <li>Match may be recorded for dispute resolution</li>
+          <li>Lobby must be joined on time — no waiting</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section id="faq">
+  <div class="container" style="max-width:720px;">
+    <div class="sec-label">Help</div>
+    <h2 class="sec-title">FAQ</h2>
+    <div class="faq-list" id="faq-list"></div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section id="contact">
+  <div class="container">
+    <div class="sec-label">Get in Touch</div>
+    <h2 class="sec-title">Contact <span class="acc">Us</span></h2>
+    <p class="sec-desc">Questions about registration, payment, or rules? Reach out directly. We respond quickly.</p>
+
+    <div class="contact-grid">
+      <div class="contact-card">
+        <h3>🏆 Nabeen — Host</h3>
+        <div class="contact-role">Tournament Host · Rule Maker · Final Authority</div>
+        <div class="contact-line">📱 WhatsApp: <strong><a href="https://wa.me/918122942754" target="_blank">+91 81229 42754</a></strong></div>
+        <div class="contact-line">📸 Instagram: <a href="https://instagram.com/its_me_nabeen30" target="_blank">@its_me_nabeen30</a></div>
+        <div class="contact-line" style="font-size:.82rem;color:var(--muted)">For: registration issues, prize queries, match disputes</div>
+      </div>
+      <div class="contact-card">
+        <h3>⚙️ Kavish — Website Manager</h3>
+        <div class="contact-role">Website Dev · Technical Support</div>
+        <div class="contact-line">📱 WhatsApp: <strong><a href="https://wa.me/917603866324" target="_blank">+91 76038 66324</a></strong></div>
+        <div class="contact-line">📸 Instagram: <a href="https://instagram.com/strange_kavish" target="_blank">@strange_kavish</a></div>
+        <div class="contact-line" style="font-size:.82rem;color:var(--muted)">For: website bugs, registration form issues, tech help</div>
+      </div>
+      <div class="contact-card" style="border-color:rgba(37,211,102,0.2)">
+        <h3>📲 Community Group</h3>
+        <div class="contact-role">Fastest way to stay updated</div>
+        <div class="contact-line" style="font-size:.88rem;color:var(--muted2);line-height:1.6">Join the WhatsApp group for match schedules, announcements, results and more. A separate match group is created 30 minutes before each game.</div>
+        <a class="wa-btn" href="https://chat.whatsapp.com/KqQaCiu2M4f4wwEVnK5yi9" target="_blank" style="margin-top:4px">Join Group</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h2>V2N <span>FF</span></h2>
+        <p class="tagline">Free Fire squad tournament series bringing competitive gaming to every player in India — no level restriction, real cash prizes, and a thriving community.</p>
+        <div class="footer-meta">
+          Hosted by <strong style="color:#fff">Nabeen</strong> · Managed by <strong style="color:#fff">Kavish</strong><br>
+          Season 1 · April 2026 · India
+        </div>
+        <div class="socials">
+          <a class="soc-btn" href="https://wa.me/918122942754" target="_blank">WhatsApp</a>
+          <a class="soc-btn" href="https://instagram.com/its_me_nabeen30" target="_blank">@nabeen</a>
+          <a class="soc-btn" href="https://instagram.com/strange_kavish" target="_blank">@kavish</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Season 1</h3>
+        <ul>
+          <li><a href="#" onclick="openModal('t1');return false">T#1 — 1 Apr 2026</a></li>
+          <li><a href="#" onclick="openModal('t2');return false">T#2 — 14 Apr 2026</a></li>
+          <li><a href="#prizes">Prize Pool</a></li>
+          <li><a href="#leaderboard">Leaderboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Info</h3>
+        <ul>
+          <li><a href="#rules">Rules</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="https://chat.whatsapp.com/KqQaCiu2M4f4wwEVnK5yi9" target="_blank">WhatsApp Group</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 V2N FF · Hosted by Nabeen · Managed by Kavish · All rights reserved</div>
+      <div class="footer-copy">Squad Entry ₹50 · Fair Play · Cash Prizes</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ REGISTRATION MODAL ═══ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+
+    <!-- FORM VIEW -->
+    <div id="modal-form">
+      <div class="modal-head">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-title" id="modal-title">Register Squad</div>
+        <div class="modal-sub" id="modal-sub">V2N FF · Entry ₹50 per Squad</div>
+      </div>
+      <div class="modal-body">
+
+        <div class="setup-warn" id="setup-warn">
+          ⚙️ ADMIN: Replace <strong>YOUR_SCRIPT_URL_HERE</strong> in the script with your Google Apps Script URL.
+        </div>
+
+        <!-- Read Rules Notice -->
+        <div class="rules-notice">
+          ⚠️ <span>Please <a href="#rules" onclick="closeModal()">read the tournament rules</a> before registering. By submitting this form you agree to all rules.</span>
+        </div>
+
+        <!-- Payment -->
+        <div class="pay-box">
+          <h4>💸 STEP 1 — Pay ₹50 First (Required)</h4>
+          <div class="upi-row">
+            <span class="upi-val" id="upi-disp">nabeen@upi</span>
+            <button class="copy-upi" onclick="copyUPI()">COPY</button>
+          </div>
+          <p class="pay-note">Send exactly <strong style="color:var(--gold)">₹50</strong> via Google Pay / PhonePe / Paytm to the above UPI ID. <strong style="color:#fff">Save your Transaction ID</strong> — it is required in the form below.</p>
+        </div>
+
+        <div class="err-box" id="err-box">⚠️ Error placeholder</div>
+
+        <!-- Team Info -->
+        <div class="fg">
+          <label class="fl">Team / Squad Name *</label>
+          <input class="fi" id="f-team" type="text" placeholder="e.g. Shadow Killers" required>
+        </div>
+
+        <!-- Squad UIDs -->
+        <div class="uid-section">
+          <div class="uid-section-title">Player UIDs — All 4 Required</div>
+          <div class="fg">
+            <label class="fl">Captain FF Nickname *</label>
+            <input class="fi" id="f-capname" type="text" placeholder="Captain's in-game name" required>
+          </div>
+          <div class="fg">
+            <label class="fl">Captain Free Fire UID *</label>
+            <input class="fi" id="f-uid1" type="text" placeholder="Captain's UID (e.g. 1234567890)" required>
+          </div>
+          <div class="fg-row">
+            <div class="fg">
+              <label class="fl">Player 2 UID *</label>
+              <input class="fi" id="f-uid2" type="text" placeholder="Player 2 UID" required>
+            </div>
+            <div class="fg">
+              <label class="fl">Player 3 UID *</label>
+              <input class="fi" id="f-uid3" type="text" placeholder="Player 3 UID" required>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">Player 4 UID *</label>
+            <input class="fi" id="f-uid4" type="text" placeholder="Player 4 UID" required>
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="fg-row">
+          <div class="fg">
+            <label class="fl">Captain Mobile *</label>
+            <input class="fi" id="f-mobile" type="tel" placeholder="10-digit number" required>
+          </div>
+          <div class="fg">
+            <label class="fl">WhatsApp Number *</label>
+            <input class="fi" id="f-wa" type="tel" placeholder="For Room ID delivery" required>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="fg-row">
+          <div class="fg">
+            <label class="fl">UPI Transaction ID *</label>
+            <input class="fi" id="f-txn" type="text" placeholder="e.g. T2312345678" required>
+          </div>
+          <div class="fg">
+            <label class="fl">Your UPI ID (for prizes) *</label>
+            <input class="fi" id="f-upi" type="text" placeholder="yourname@upi" required>
+          </div>
+        </div>
+
+        <!-- State -->
+        <div class="fg">
+          <label class="fl">State / Region *</label>
+          <input class="fi" id="f-state" type="text" placeholder="e.g. Tamil Nadu" required>
+        </div>
+
+        <button class="submit-btn" id="submit-btn" onclick="submitReg()">
+          ⚔️ Confirm Squad Registration — ₹50 Paid
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div class="success-view" id="modal-success">
+      <div class="suc-icon">🎉</div>
+      <div class="suc-title">Squad Registered!</div>
+      <p style="color:var(--muted2);margin-bottom:4px;font-size:.92rem">Your squad has been saved. Room ID arrives on WhatsApp 30 min before 11:00 AM.</p>
+
+      <div class="code-note">
+        <div class="code-note-title">🔑 YOUR UNIQUE REGISTRATION CODE</div>
+        <div class="code-note-val" id="reg-code">V2N-00000</div>
+        <div class="code-note-warn">
+          📸 <span><strong style="color:#fff">Screenshot or write this code down NOW.</strong><br>This code is your only proof of registration. You will need it in case of any disputes.</span>
+        </div>
+      </div>
+
+      <a class="wa-btn" href="https://chat.whatsapp.com/KqQaCiu2M4f4wwEVnK5yi9" target="_blank" style="display:inline-block;margin-bottom:12px">📲 Join WhatsApp Group</a>
+      <br>
+      <button class="btn-ghost" onclick="closeModal()" style="margin-top:10px">Close</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ═══════════════════════════════ SCRIPT ═══════════════════════════════ -->
+<script>
+// ══════════════════════════════════════
+//  ⚙️  CONFIGURE THESE 2 LINES
+// ══════════════════════════════════════
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzgU3GaPm1mRV0o7M8UbHS0Lrp-1YlkL-1oYMWfR_KHfd08kuVCh8YFPzizOSeCCfCjMw/exec";   // Paste Google Apps Script URL here
+const HOST_UPI  = "nabeen@upi";             // Nabeen's real UPI ID
+// ══════════════════════════════════════
+
+// Slot tracking per tournament (starts at 0, max 10)
+const slotCounts = { t1: 0, t2: 0 };
+
+// Tournament info
+const tInfo = {
+  t1: { name: 'Tournament #1', date: '1 April 2026', time: '11:00 AM IST' },
+  t2: { name: 'Tournament #2', date: '14 April 2026', time: '11:00 AM IST' },
+};
+let activeTid = 't1';
+
+// ── INIT ──
+document.getElementById('upi-disp').textContent = HOST_UPI;
+if (SHEET_URL === 'YOUR_SCRIPT_URL_HERE') {
+  document.getElementById('setup-warn').classList.add('show');
+}
+
+// ── COUNTDOWN to T1 ──
+function tick() {
+  const d = new Date('2026-04-01T11:00:00+05:30') - new Date();
+  if (d <= 0) { ['cd-d','cd-h','cd-m','cd-s'].forEach(i=>document.getElementById(i).textContent='00'); return; }
+  document.getElementById('cd-d').textContent = String(Math.floor(d/86400000)).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(Math.floor((d%60000)/1000)).padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+// ── SCROLL TO REGISTER SECTION ──
+function scrollToRegister() {
+  document.getElementById('tournaments').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── MODAL ──
+function openModal(tid) {
+  activeTid = tid;
+  const t = tInfo[tid];
+  document.getElementById('modal-title').textContent = 'Register — ' + t.name;
+  document.getElementById('modal-sub').textContent = 'V2N FF · ' + t.date + ' · ' + t.time + ' · ₹50 Per Squad';
+  document.getElementById('modal-form').style.display = 'block';
+  document.getElementById('modal-success').classList.remove('show');
+  document.getElementById('err-box').classList.remove('show');
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = false;
+  btn.innerHTML = '⚔️ Confirm Squad Registration — ₹50 Paid';
+  btn.classList.remove('loading');
+  document.getElementById('modal-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+// ── COPY UPI ──
+function copyUPI() {
+  navigator.clipboard.writeText(HOST_UPI)
+    .then(() => showToast('✅ UPI Copied: ' + HOST_UPI))
+    .catch(() => showToast('UPI ID: ' + HOST_UPI));
+}
+
+// ── SUBMIT → GOOGLE SHEETS ──
+async function submitReg() {
+  const g = id => document.getElementById(id).value.trim();
+  const team   = g('f-team');
+  const capName= g('f-capname');
+  const uid1   = g('f-uid1');
+  const uid2   = g('f-uid2');
+  const uid3   = g('f-uid3');
+  const uid4   = g('f-uid4');
+  const mobile = g('f-mobile');
+  const wa     = g('f-wa');
+  const txn    = g('f-txn');
+  const upi    = g('f-upi');
+  const state  = g('f-state');
+  const err    = document.getElementById('err-box');
+
+  // Validate all required
+  if (!team||!capName||!uid1||!uid2||!uid3||!uid4||!mobile||!wa||!txn||!upi||!state) {
+    err.textContent = '⚠️ All fields are required. Please fill in every box.';
+    err.classList.add('show'); return;
+  }
+  if (!/^\d{10}$/.test(mobile)) {
+    err.textContent = '⚠️ Enter a valid 10-digit captain mobile number.';
+    err.classList.add('show'); return;
+  }
+  if (SHEET_URL === 'YOUR_SCRIPT_URL_HERE') {
+    err.textContent = '⚙️ Admin: Update SHEET_URL in the script with your Google Apps Script deployment URL.';
+    err.classList.add('show'); return;
+  }
+
+  // Check slot availability
+  if (slotCounts[activeTid] >= 10) {
+    err.textContent = '❌ This tournament is full (10 teams). Try the other tournament!';
+    err.classList.add('show'); return;
+  }
+
+  err.classList.remove('show');
+  const regCode = 'V2N-' + Date.now().toString(36).toUpperCase().slice(-5);
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Saving to Google Sheets...';
+  btn.classList.add('loading');
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        regCode, tournament: tInfo[activeTid].name + ' — ' + tInfo[activeTid].date,
+        teamName: team, captainName: capName,
+        captainUID: uid1, player2UID: uid2, player3UID: uid3, player4UID: uid4,
+        mobile, whatsapp: wa, txnID: txn, playerUPI: upi, state,
+      }),
+    });
+
+    // Update slot count
+    slotCounts[activeTid]++;
+    const n = slotCounts[activeTid];
+    document.getElementById('slots-' + activeTid + '-display').textContent = n + ' / 10';
+    document.getElementById('bar-' + activeTid).style.width = (n / 10 * 100) + '%';
+
+    document.getElementById('reg-code').textContent = regCode;
+    document.getElementById('modal-form').style.display = 'none';
+    document.getElementById('modal-success').classList.add('show');
+    showToast('🎮 ' + team + ' registered! Code: ' + regCode);
+    launchConfetti();
+
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '⚔️ Confirm Squad Registration — ₹50 Paid';
+    btn.classList.remove('loading');
+    err.textContent = '❌ Network error. Check your connection and try again.';
+    err.classList.add('show');
+  }
+}
+
+// ── FAQ ──
+[
+  ['What is V2N FF?',
+   'V2N FF is a Free Fire squad tournament series hosted by Nabeen and managed by Kavish. It features competitive custom room matches with real cash prizes paid via UPI.'],
+  ['How do I register my squad?',
+   'Click "Register Squad" on any tournament card, pay ₹50 via UPI to Nabeen\'s ID, then fill the form with all 4 player UIDs, transaction ID and team details.'],
+  ['When and how do I get the Room ID?',
+   'A separate WhatsApp group will be created 30 minutes before the 11:00 AM match. Room ID and password will be shared there. Make sure your WhatsApp number is correct.'],
+  ['Who is eligible to participate?',
+   'Anyone! There are no level or rank restrictions. Any Free Fire player of any level is welcome to register their squad and compete.'],
+  ['How are prizes paid?',
+   'Winners receive their prize directly to the UPI ID provided during registration, within 24 hours of the match results being announced.'],
+  ['What if only fewer than 10 teams register?',
+   'The tournament still happens. Prize pool scales to total entries. The match will proceed with all registered squads.'],
+  ['Can I register for both tournaments?',
+   'Yes! Your squad can register for both Tournament #1 (1 Apr) and Tournament #2 (14 Apr). Each requires a separate ₹50 entry.'],
+  ['How do I claim the Top Fragger prize?',
+   'Take a screenshot of your end-of-match kill count and share it in the match WhatsApp group. The player with the most individual kills wins ₹35.'],
+].forEach(([q,a],i)=>{
+  document.getElementById('faq-list').innerHTML += `<div class="faq-item" id="fq${i}"><button class="faq-q" onclick="document.getElementById('fq${i}').classList.toggle('open')">${q}<em>+</em></button><div class="faq-a">${a}</div></div>`;
+});
+
+// ── TOAST ──
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ── CONFETTI ──
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.style.display = 'block';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const colors = ['#FF4500','#FFD700','#00FFD1','#ff6a00','#a855f7','#ffffff','#ff3399'];
+  const pieces = Array.from({length: 140}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: Math.random() * 10 + 5,
+    h: Math.random() * 6 + 3,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    rot: Math.random() * 360,
+    vx: (Math.random() - 0.5) * 3,
+    vy: Math.random() * 3 + 2,
+    vr: (Math.random() - 0.5) * 6,
+    alpha: 1,
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x + p.w/2, p.y + p.h/2);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      ctx.restore();
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+      if (frame > 80) p.alpha -= 0.012;
+    });
+    frame++;
+    if (frame < 160) requestAnimationFrame(draw);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.style.display = 'none'; }
+  }
+  draw();
+}
+
+// ── SCROLL ANIMATIONS ──
+const obs = new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}
+}),{threshold:0.08});
+document.querySelectorAll('.tc,.p-card,.rule-card,.step,.why-card,.contact-card').forEach(el=>{
+  el.style.opacity='0'; el.style.transform='translateY(20px)';
+  el.style.transition='opacity .5s ease,transform .5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
